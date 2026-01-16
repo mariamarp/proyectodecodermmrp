@@ -43,14 +43,11 @@ class CartManager {
         if (cartIndex === -1) return null;
 
         const cart = carts[cartIndex];
-        // Verificar si el producto ya existe en el carrito
         const productIndex = cart.products.findIndex(p => p.product === parseInt(pid));
 
         if (productIndex !== -1) {
-            // Si existe, sumamos cantidad
             cart.products[productIndex].quantity++;
         } else {
-            // Si no existe, lo agregamos con id y cantidad 1
             cart.products.push({ product: parseInt(pid), quantity: 1 });
         }
 

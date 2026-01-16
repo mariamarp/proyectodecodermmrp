@@ -3,13 +3,11 @@ const ProductManager = require('../managers/ProductManager');
 const path = require('path');
 
 const router = Router();
-// Instanciamos el manager apuntando al archivo json
 const productManager = new ProductManager(path.join(__dirname, '../data/products.json'));
 
 router.get('/', async (req, res) => {
     try {
         const products = await productManager.getProducts();
-        // Soporte para query param ?limit=5
         const limit = req.query.limit;
         if (limit) {
             return res.json(products.slice(0, limit));
