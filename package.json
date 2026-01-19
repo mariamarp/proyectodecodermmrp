@@ -1,10 +1,9 @@
 {
   "name": "maria-manuela-rodriguez-ponte",
-  "version": "1.0.0",
-  "description": "",
+"version": "1.0.0",
+  "description": "Primera entrega backend",
   "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
@@ -15,6 +14,6 @@
     "express": "^4.21.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.9"
   }
 }
