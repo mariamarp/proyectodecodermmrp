@@ -1,0 +1,13 @@
+[
+	{
+		"id": 1,
+		"title": "Teclado Gamer",
+		"description": "Luces RGB",
+		"price": 5000,
+		"thumbnail": [],
+		"code": "TEC001",
+		"stock": 10,
+		"category": "Perifericos",
+		"status": true
+	}
+]
