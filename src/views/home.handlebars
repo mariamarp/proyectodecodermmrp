@@ -1,0 +1,25 @@
+<h1>Panel de Control - Tienda</h1>
+<hr>
+<nav>
+    <a href="/products"><button>Ver Productos (Estático)</button></a>
+    <a href="/realtimeproducts"><button>Administrar en Tiempo Real</button></a>
+</nav>
+
+<style>
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+    }
+</style>
+
+<h1>Lista de Productos (Estática)</h1>
+
+<ul>
+    {{#each products}}
+        <li>
+            <strong>{{this.title}}</strong> - ${{this.price}}
+        </li>
+    {{/each}}
+</ul>
+

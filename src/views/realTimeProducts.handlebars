@@ -1,0 +1,23 @@
+<h1>Panel de Control - Tienda</h1>
+<hr>
+<nav>
+    <a href="/products"><button>Ver Productos (Estático)</button></a>
+   </nav>
+<h1>Productos en Tiempo Real</h1>
+
+<h2>Agregar Producto</h2>
+<form id="productForm">
+    <input type="text" id="title" placeholder="Nombre" required>
+    <input type="number" id="price" placeholder="Precio" required>
+    <input type="text" id="code" placeholder="Código" required>
+    <input type="number" id="stock" placeholder="Stock" required>
+    <input type="text" id="category" placeholder="Categoría" required>
+    <button type="submit">Agregar</button>
+</form>
+
+<hr>
+
+<ul id="productList"></ul>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTimeProducts.js"></script>

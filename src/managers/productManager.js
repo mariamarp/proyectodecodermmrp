@@ -18,28 +18,31 @@ class ProductManager {
     }
 
     async addProduct(product) {
-        const products = await this.getProducts(); 
+        const products = await this.getProducts();
 
-        if (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.category) {
-            throw new Error("Faltan campos obligatorios");
+        const { title, description, price, thumbnails, code, stock, category } = product;
+
+        if (!title || !description || !price || !code || !stock || !category) {
+            console.log("Error: Todos los campos son obligatorios");
+            return; 
         }
 
-        if (products.some(p => p.code === product.code)) {
-            throw new Error("El código del producto ya existe");
-        }
 
-        const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+        if (products.some(p => p.code === code)) {
+            console.log("Error: El código del producto ya existe");
+            return;
+        }
 
         const newProduct = {
-            id: newId,
-            title: product.title,
-            description: product.description,
-            price: product.price,
-            thumbnail: product.thumbnails || [], 
-            code: product.code,
-            stock: product.stock,
-            category: product.category,
-            status: true 
+            id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
+            title,
+            description,
+            price,
+            thumbnails: thumbnails || [], 
+            code,
+            stock,
+            category,
+            status: true
         };
 
         products.push(newProduct);

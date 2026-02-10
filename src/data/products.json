@@ -9,5 +9,16 @@
 		"stock": 10,
 		"category": "Perifericos",
 		"status": true
+	},
+	{
+		"id": 2,
+		"title": "mouse",
+		"description": "Descripción por defecto",
+		"price": 5000,
+		"thumbnails": [],
+		"code": "mouse001",
+		"stock": 10,
+		"category": "informa",
+		"status": true
 	}
 ]
