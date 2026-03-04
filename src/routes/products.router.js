@@ -1,60 +1,47 @@
-const { Router } = require('express');
-const ProductManager = require('../managers/ProductManager');
-const path = require('path');
+import { Router } from "express";
+import { productsModel } from "../models/products.model.js";
 
 const router = Router();
-const productManager = new ProductManager(path.join(__dirname, '../data/products.json'));
 
-router.get('/', async (req, res) => {
-    try {
-        const products = await productManager.getProducts();
-        const limit = req.query.limit;
-        if (limit) {
-            return res.json(products.slice(0, limit));
-        }
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+router.get("/", async (req, res) => {
+  try {
+    const { limit = 10, page = 1, sort, query } = req.query;
+
+    // Lógica de filtrado por categoría o disponibilidad 
+    let filter = {};
+    if (query) {
+      filter = {
+        $or: [
+          { category: query },
+          { status: query === "true" }
+        ]
+      };
     }
+
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort: sort ? { price: sort === "asc" ? 1 : -1 } : {},
+      lean: true // Necesario para que Handlebars lea los objetos correctamente 
+    };
+
+    const result = await productsModel.paginate(filter, options);
+
+    res.send({
+      status: "success",
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink: result.hasPrevPage ? `/api/products?page=${result.prevPage}&limit=${limit}${sort ? `&sort=${sort}` : ""}${query ? `&query=${query}` : ""}` : null,
+      nextLink: result.hasNextPage ? `/api/products?page=${result.nextPage}&limit=${limit}${sort ? `&sort=${sort}` : ""}${query ? `&query=${query}` : ""}` : null,
+    });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: "Error al obtener productos" });
+  }
 });
 
-router.get('/:pid', async (req, res) => {
-    try {
-        const product = await productManager.getProductById(req.params.pid);
-        if (!product) return res.status(404).json({ error: "Producto no encontrado" });
-        res.json(product);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-router.post('/', async (req, res) => {
-    try {
-        const newProduct = await productManager.addProduct(req.body);
-        res.status(201).json(newProduct);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.put('/:pid', async (req, res) => {
-    try {
-        const updatedProduct = await productManager.updateProduct(req.params.pid, req.body);
-        if (!updatedProduct) return res.status(404).json({ error: "Producto no encontrado" });
-        res.json(updatedProduct);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-router.delete('/:pid', async (req, res) => {
-    try {
-        const deleted = await productManager.deleteProduct(req.params.pid);
-        if (!deleted) return res.status(404).json({ error: "Producto no encontrado" });
-        res.json({ message: "Producto eliminado correctamente" });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-module.exports = router;
+export default router;

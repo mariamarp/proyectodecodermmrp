@@ -1,32 +1,28 @@
-const { Router } = require('express');
-const ProductManager = require('../managers/ProductManager');
-const path = require('path');
+import { Router } from 'express';
+import { productsModel } from '../models/products.model.js';
 
 const router = Router();
 
-const rutaExacta = path.join(process.cwd(), 'src/data/products.json');
-const productManager = new ProductManager(rutaExacta);
-
-router.get('/', async (req, res) => {
-    try {
-        const products = await productManager.getProducts();
-        res.render('home', { products, title: "Inicio" });
-    } catch (error) {
-        res.status(500).send('Error al cargar home');
-    }
-});
-
 router.get('/products', async (req, res) => {
-    try {
-        const products = await productManager.getProducts();
-        res.render('home', { products, title: "Productos Estáticos" });
-    } catch (error) {
-        res.status(500).send('Error al cargar productos');
-    }
+    const { page = 1, limit = 10 } = req.query;
+    const { docs, hasPrevPage, hasNextPage, prevPage, nextPage, totalPages } = 
+        await productsModel.paginate({}, { limit, page, lean: true });
+
+    res.render('products', {
+        products: docs,
+        page,
+        hasPrevPage,
+        hasNextPage,
+        prevPage,
+        nextPage,
+        totalPages
+    });
 });
 
-router.get('/realtimeproducts', (req, res) => {
-    res.render('realTimeProducts', { title: "Tiempo Real" });
+router.get('/carts/:cid', async (req, res) => {
+    const { cid } = req.params;
+    const cart = await cartsModel.findOne({ _id: cid }).lean();
+    res.render('cart', { cart });
 });
 
-module.exports = router;
+export default router;

@@ -1,46 +1,53 @@
-const { Router } = require('express');
-const CartManager = require('../managers/CartManager');
-const path = require('path');
+import { Router } from "express";
+import { cartsModel } from "../models/carts.model.js";
 
 const router = Router();
-const cartManager = new CartManager(path.join(__dirname, '../data/carts.json'));
 
-router.post('/', async (req, res) => {
-    try {
-        const newCart = await cartManager.createCart();
-        res.status(201).json(newCart);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+router.delete("/:cid/products/:pid", async (req, res) => {
+  try {
+    const { cid, pid } = req.params;
+    const cart = await cartsModel.findByIdAndUpdate(
+      cid,
+      { $pull: { products: { product: pid } } },
+      { new: true }
+    );
+    res.send({ status: "success", message: "Producto eliminado", payload: cart });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
+  }
 });
 
-router.get('/:cid', async (req, res) => {
-    try {
-        const cart = await cartManager.getCartById(req.params.cid);
-        if (!cart) return res.status(404).json({ error: "Carrito no encontrado" });
-        res.json(cart.products);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+router.put("/:cid", async (req, res) => {
+  try {
+    const cart = await cartsModel.findByIdAndUpdate(req.params.cid, { products: req.body }, { new: true });
+    res.send({ status: "success", payload: cart });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
+  }
 });
 
-router.post('/:cid/product/:pid', async (req, res) => {
-    try {
-        const { cid, pid } = req.params;
-        const { quantity } = req.body; 
-
-        const cart = await cartManager.addProductToCart(cid, pid, quantity || 1);
-        
-        res.json(cart);
-    } catch (error) {
-        if (error.message.includes("no existe") || error.message.includes("encontrado")) {
-             return res.status(404).json({ error: error.message });
-        }
-        if (error.message.includes("Stock")) {
-             return res.status(400).json({ error: error.message });
-        }
-        res.status(500).json({ error: error.message });
-    }
+router.put("/:cid/products/:pid", async (req, res) => {
+  try {
+    const { cid, pid } = req.params;
+    const { quantity } = req.body;
+    const cart = await cartsModel.findOneAndUpdate(
+      { _id: cid, "products.product": pid },
+      { $set: { "products.$.quantity": quantity } },
+      { new: true }
+    );
+    res.send({ status: "success", payload: cart });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
+  }
 });
 
-module.exports = router;
+router.delete("/:cid", async (req, res) => {
+  try {
+    const cart = await cartsModel.findByIdAndUpdate(req.params.cid, { products: [] }, { new: true });
+    res.send({ status: "success", message: "Carrito vaciado", payload: cart });
+  } catch (error) {
+    res.status(500).send({ status: "error", message: error.message });
+  }
+});
+
+export default router;
